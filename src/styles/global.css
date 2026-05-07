@@ -18,23 +18,8 @@
   --gradient-hero: linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0.35) 100%);
 
   /* ── BRANDING DEL CLIENTE ─────────────────────────── */
-  /* Modificar estas variables para aplicar la identidad visual del sponsor */
-
-  /* Fondo de la aplicación */
-  --brand-app-bg:          #080210;
-
-  /* Splash screen */
-  --brand-splash-bg:       linear-gradient(135deg, #080210 0%, #3d1079 50%, #080210 100%);
-
-  /* Header */
-  --brand-header-bg:       rgba(255, 255, 255 );
-  --brand-header-text:     #9ca3af;
-
-  /* Navbar inferior */
-  --brand-nav-bg:          #ffffff;
-  --brand-nav-text:        #080210;
-  --brand-nav-icon:        #080210;
-  --brand-nav-icon-active: #5314ff;
+  /* NOTA: Las variables --brand-* ya no se definen aquí de forma estática. */
+  /* Son inyectadas dinámicamente en <head> desde src/data/sponsor.json a través de Layout.astro */
 }
 
 * {

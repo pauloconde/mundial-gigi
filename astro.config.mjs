@@ -2,6 +2,7 @@
 import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import AstroPWA from '@vite-pwa/astro';
+import sponsorInfo from './src/data/sponsor.json';
 
 // https://astro.build/config
 export default defineConfig({
@@ -16,11 +17,11 @@ export default defineConfig({
       includeAssets: ['favicon.svg', 'favicon.ico', 'icon-192.png', 'icon-512.png', 'icon-192-maskable.png', 'icon-512-maskable.png', 'apple-touch-icon.png'],
       registerType: 'autoUpdate',
       manifest: {
-        name: 'FIFA World Cup 2026',
-        short_name: 'Mundial 2026',
-        description: 'Calendario y resultados del Mundial FIFA 2026',
-        theme_color: '#053332',
-        background_color: '#053332',
+        name: sponsorInfo.seo.titleTemplate.replace('%s', sponsorInfo.name),
+        short_name: sponsorInfo.seo.defaultTitle,
+        description: sponsorInfo.seo.description,
+        theme_color: sponsorInfo.colors.appBg,
+        background_color: sponsorInfo.colors.appBg,
         display: 'standalone',
         start_url: '/',
         icons: [

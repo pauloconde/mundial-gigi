@@ -2,6 +2,8 @@
 import '../styles/global.css';
 import { fetchWorldCupData, getMatchUTC } from '../lib/worldcup';
 import sponsorInfo from '../data/sponsor.json';
+// @ts-ignore
+import { pwaInfo } from 'virtual:pwa-info';
 
 interface Props {
   title?: string;
@@ -10,10 +12,15 @@ interface Props {
 }
 
 const {
-  title = 'Mundial 2026',
-  description = 'Calendario oficial, grupos y resultados del Mundial FIFA 2026',
+  title = sponsorInfo.seo.defaultTitle,
+  description = sponsorInfo.seo.description,
   page = 'home'
 } = Astro.props;
+
+// Resolvemos el título final
+const pageTitle = title === sponsorInfo.seo.defaultTitle
+  ? sponsorInfo.seo.defaultTitle
+  : sponsorInfo.seo.titleTemplate.replace('%s', title);
 
 // Recoger todos los kickoffs para detección de partidos en vivo en el cliente
 const data = await fetchWorldCupData();
@@ -29,15 +36,38 @@ const kickoffISOs = data.matches.map(m => getMatchUTC(m));
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#0a0e1a" />
+    <meta name="keywords" content={sponsorInfo.seo.keywords} />
+    <meta name="theme-color" content={sponsorInfo.colors.appBg} />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <title>FIFA World Cup 2026{title !== 'Mundial 2026' ? ` | ${title}` : ''}</title>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+    { pwaInfo && <Fragment set:html={pwaInfo.webManifest.linkTag} /> }
+    <title>{pageTitle}</title>
 
     <!-- Open Graph -->
-    <meta property="og:title" content={title} />
+    <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:image" content={new URL(sponsorInfo.seo.ogImage, Astro.site || Astro.url).toString()} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL(sponsorInfo.seo.ogImage, Astro.site || Astro.url).toString()} />
+
+    <style is:global set:html={`
+      :root {
+        --brand-app-bg: ${sponsorInfo.colors.appBg};
+        --brand-splash-bg: ${sponsorInfo.colors.splashBg};
+        --brand-header-bg: ${sponsorInfo.colors.headerBg};
+        --brand-header-text: ${sponsorInfo.colors.headerText};
+        --brand-nav-bg: ${sponsorInfo.colors.navBg};
+        --brand-nav-text: ${sponsorInfo.colors.navText};
+        --brand-nav-icon: ${sponsorInfo.colors.navIcon};
+        --brand-nav-icon-active: ${sponsorInfo.colors.navIconActive};
+      }
+    `} />
 
     <!-- Capturar PWA Prompt tempranamente -->
     <script is:inline>
@@ -199,9 +229,9 @@ const kickoffISOs = data.matches.map(m => getMatchUTC(m));
             <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-500 mb-3 text-center">Instalar app</p>
             <button id="install-btn"
                     class="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl font-semibold text-sm transition-transform active:scale-95 hover:opacity-90"
-                    style="background: var(--brand-nav-icon-active, #f59e0b); color: #000; box-shadow: 0 4px 14px rgba(0,0,0,0.15);">
-              <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M17.523 15.341 14 12l3.523-3.341A1 1 0 0 0 16.8 7H7.2a1 1 0 0 0-.723 1.659L10 12l-3.523 3.341A1 1 0 0 0 7.2 17h9.6a1 1 0 0 0 .723-1.659Z"/>
+                    style="background: var(--brand-nav-icon-active, #f59e0b); color: #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.15);">
+              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
               Instalar en Android
             </button>
