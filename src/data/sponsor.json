@@ -1,6 +1,7 @@
 {
   "name": "pauloconde.dev",
   "website": "https://pauloconde.dev",
+  "showWebsiteIcon": true,
   "deployUrl": "https://calendario.mundial.click",
   "logoPath": "/paulocondedev.png",
   "drawerLogoPath": "/paulocondedev.png",

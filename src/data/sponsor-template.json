@@ -1,6 +1,7 @@
 {
   "name": "",
   "website": "",
+  "showWebsiteIcon": true,
   "deployUrl": "https://XXXX.mundial.click",
   "logoPath": "/logo.svg",
   "drawerLogoPath": "/logo.svg",
