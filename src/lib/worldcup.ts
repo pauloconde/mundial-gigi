@@ -284,7 +284,7 @@ export async function fetchWorldCupData(): Promise<WorldCupData> {
         id: m.id,
         num: m.numero_partido,
         round: m.ronda,
-        grupo: m.grupo || undefined,
+        group: m.grupo || undefined,
         date: m.fecha_inicio_utc, // ISO string in UTC
         time: undefined,          // Omitted since date is full ISO datetime
         team1: m.team1_id,

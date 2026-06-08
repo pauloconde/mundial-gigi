@@ -76,39 +76,50 @@ const hayResultados  = standings.some(s => s.teams.some(t => t.played > 0));
               <span class="text-center text-amber-400 font-black">Pts</span>
             </div>
 
-            {groupData.teams.map((team, idx) => {
-              const leftColor = idx < 2 ? '#10b981' : idx === 2 ? '#f59e0b' : 'transparent';
-              return (
-                <div
-                  class="standings-row grid items-center px-3 py-2.5"
-                  style={`grid-template-columns: 1fr 26px 26px 26px 26px 28px 30px;
-                          border-left: 3px solid ${leftColor};`}
-                >
-                  <div class="flex items-center gap-2 min-w-0">
-                    <span class="text-xs text-[var(--text-secondary)] w-4 shrink-0">{idx + 1}</span>
-                    <img src={getFlagUrl(team.team)} alt={team.teamEs}
-                         class="flag-img shrink-0" onerror="this.style.display='none'" />
-                    <span class="text-sm font-semibold truncate">{team.teamEs}</span>
+            <div class="standings-rows-container" data-group-name={groupData.group}>
+              {groupData.teams.map((team, idx) => {
+                const leftColor = idx < 2 ? '#10b981' : idx === 2 ? '#f59e0b' : 'transparent';
+                return (
+                  <div
+                    class="standings-row grid items-center px-3 py-2.5"
+                    style={`grid-template-columns: 1fr 26px 26px 26px 26px 28px 30px;
+                            border-left: 3px solid ${leftColor};`}
+                  >
+                    <div class="flex items-center gap-2 min-w-0">
+                      <span class="text-xs text-[var(--text-secondary)] w-4 shrink-0">{idx + 1}</span>
+                      <img src={getFlagUrl(team.team)} alt={team.teamEs}
+                           class="flag-img shrink-0" onerror="this.style.display='none'" />
+                      <span class="text-sm font-semibold truncate">{team.teamEs}</span>
+                    </div>
+                    <span class="text-xs text-center text-[var(--text-secondary)]">{team.played}</span>
+                    <span class="text-xs text-center text-[var(--text-secondary)]">{team.won}</span>
+                    <span class="text-xs text-center text-[var(--text-secondary)]">{team.drawn}</span>
+                    <span class="text-xs text-center text-[var(--text-secondary)]">{team.lost}</span>
+                    <span class={`text-xs text-center font-semibold ${team.gd > 0 ? 'text-emerald-400' : team.gd < 0 ? 'text-red-400' : 'text-[var(--text-secondary)]'}`}>
+                      {team.gd > 0 ? '+' : ''}{team.gd}
+                    </span>
+                    <span class="text-sm font-black text-center text-amber-400">{team.points}</span>
                   </div>
-                  <span class="text-xs text-center text-[var(--text-secondary)]">{team.played}</span>
-                  <span class="text-xs text-center text-[var(--text-secondary)]">{team.won}</span>
-                  <span class="text-xs text-center text-[var(--text-secondary)]">{team.drawn}</span>
-                  <span class="text-xs text-center text-[var(--text-secondary)]">{team.lost}</span>
-                  <span class={`text-xs text-center font-semibold ${team.gd > 0 ? 'text-emerald-400' : team.gd < 0 ? 'text-red-400' : 'text-[var(--text-secondary)]'}`}>
-                    {team.gd > 0 ? '+' : ''}{team.gd}
-                  </span>
-                  <span class="text-sm font-black text-center text-amber-400">{team.points}</span>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
 
           <!-- Partidos del grupo -->
           <div class="space-y-2">
             {groupMatches.map(match => {
               const utc = getMatchUTC(match);
+              const scored = hasScore(match);
+              const ft = match.score?.ft;
+              const p = match.score?.p;
+              
+              const t1Wins = ft && (ft[0] > ft[1] || (ft[0] === ft[1] && p && p[0] > p[1]));
+              const t2Wins = ft && (ft[1] > ft[0] || (ft[0] === ft[1] && p && p[1] > p[0]));
+              
               return (
-                <div class="match-card px-4 py-3">
+                <div class="match-card px-4 py-3 cursor-pointer transition-all hover:border-amber-400/30 border border-transparent"
+                     data-match-id={match.id}
+                     onclick={`window.openMatchDetailDrawer && window.openMatchDetailDrawer('${match.id}')`}>
                   <div class="flex items-center gap-3">
 
                     <!-- Fecha / hora local -->
@@ -116,12 +127,20 @@ const hayResultados  = standings.some(s => s.teams.some(t => t.played > 0));
                       <p class="text-[9px] text-[var(--text-secondary)] font-semibold leading-tight">
                         <time data-utc={utc} data-fmt="date-short">…</time>
                       </p>
-                      <p class="text-[9px] text-amber-400 font-bold mt-0.5">
-                        {hasScore(match)
-                          ? <span class="text-[8px] font-bold px-1.5 py-0.5 rounded-full" style="background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3);">TC</span>
-                          : <time data-utc={utc} data-fmt="time">--:--</time>
-                        }
-                      </p>
+                      <div class="match-status-container mt-0.5">
+                        {scored ? (
+                          <div class="flex flex-col items-center gap-1">
+                            <span class="text-[8px] font-bold px-1.5 py-0.5 rounded-full inline-block"
+                                  style="background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3);">
+                              TC
+                            </span>
+                          </div>
+                        ) : (
+                          <p class="font-['Outfit'] font-bold text-xs text-amber-400">
+                            <time data-utc={utc} data-fmt="time">--:--</time>
+                          </p>
+                        )}
+                      </div>
                     </div>
 
                     <div class="flex-1 flex items-center justify-between gap-2 min-w-0">
@@ -130,12 +149,16 @@ const hayResultados  = standings.some(s => s.teams.some(t => t.played > 0));
                         <img src={getFlagUrl(match.team1)} alt={translateTeam(match.team1)}
                              class="w-6 h-4 object-cover rounded shrink-0"
                              onerror="this.style.display='none'" />
-                        <span class="text-sm font-semibold truncate">{translateTeam(match.team1)}</span>
+                        <span class={`team1-name-span text-sm font-semibold truncate ${
+                          scored && t1Wins ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'
+                        }`}>
+                          {translateTeam(match.team1)}
+                        </span>
                       </div>
 
                       <!-- Marcador o VS -->
-                      <div class="shrink-0 px-3">
-                        {hasScore(match) ? (
+                      <div class="shrink-0 px-3 match-score-container text-center">
+                        {scored ? (
                           <span class="font-['Outfit'] font-black text-lg gradient-text">{getScoreString(match)}</span>
                         ) : (
                           <span class="text-xs text-[var(--text-secondary)] font-bold">vs</span>
@@ -144,7 +167,11 @@ const hayResultados  = standings.some(s => s.teams.some(t => t.played > 0));
 
                       <!-- Equipo 2 -->
                       <div class="flex items-center gap-2 flex-1 min-w-0 justify-end">
-                        <span class="text-sm font-semibold truncate text-right">{translateTeam(match.team2)}</span>
+                        <span class={`team2-name-span text-sm font-semibold truncate text-right ${
+                          scored && t2Wins ? 'text-[var(--text-primary)]' : 'text-[var(--text-secondary)]'
+                        }`}>
+                          {translateTeam(match.team2)}
+                        </span>
                         <img src={getFlagUrl(match.team2)} alt={translateTeam(match.team2)}
                              class="w-6 h-4 object-cover rounded shrink-0"
                              onerror="this.style.display='none'" />
@@ -170,4 +197,173 @@ const hayResultados  = standings.some(s => s.teams.some(t => t.played > 0));
     })}
 
   </div>
+
+  <!-- Script cliente: Recalcular posiciones y escuchar en tiempo real -->
+  <script>
+    import { supabase } from '../lib/supabase';
+    import { translateTeam, getFlagUrl } from '../lib/worldcup';
+
+    function updateStandings(matches: any[]) {
+      const groupMatchesMap = new Map<string, any[]>();
+      matches.forEach(m => {
+        if (m.grupo) {
+          if (!groupMatchesMap.has(m.grupo)) {
+            groupMatchesMap.set(m.grupo, []);
+          }
+          groupMatchesMap.get(m.grupo)!.push(m);
+        }
+      });
+
+      const containers = document.querySelectorAll('.standings-rows-container');
+      containers.forEach(container => {
+        const groupName = container.getAttribute('data-group-name');
+        if (!groupName) return;
+
+        const groupMatches = groupMatchesMap.get(groupName) ?? [];
+        const teamsMap = new Map<string, any>();
+        
+        groupMatches.forEach(m => {
+          [m.team1_id, m.team2_id].forEach(teamId => {
+            if (teamId && !teamsMap.has(teamId)) {
+              teamsMap.set(teamId, {
+                team: teamId,
+                teamEs: translateTeam(teamId),
+                played: 0,
+                won: 0,
+                drawn: 0,
+                lost: 0,
+                gf: 0,
+                ga: 0,
+                gd: 0,
+                points: 0
+              });
+            }
+          });
+        });
+
+        if (teamsMap.size === 0) return;
+
+        groupMatches.forEach(m => {
+          if (m.estado === 'finalizado' || m.estado === 'en_curso') {
+            const t1 = teamsMap.get(m.team1_id);
+            const t2 = teamsMap.get(m.team2_id);
+            if (t1 && t2) {
+              const g1 = m.goles_team1 ?? 0;
+              const g2 = m.goles_team2 ?? 0;
+
+              t1.played++;
+              t2.played++;
+              t1.gf += g1;
+              t1.ga += g2;
+              t1.gd = t1.gf - t1.ga;
+              t2.gf += g2;
+              t2.ga += g1;
+              t2.gd = t2.gf - t2.ga;
+
+              if (g1 > g2) {
+                t1.won++;
+                t1.points += 3;
+                t2.lost++;
+              } else if (g1 < g2) {
+                t2.won++;
+                t2.points += 3;
+                t1.lost++;
+              } else {
+                t1.drawn++;
+                t1.points++;
+                t2.drawn++;
+                t2.points++;
+              }
+            }
+          }
+        });
+
+        const sortedTeams = Array.from(teamsMap.values()).sort((a, b) => {
+          if (b.points !== a.points) return b.points - a.points;
+          if (b.gd !== a.gd) return b.gd - a.gd;
+          if (b.gf !== a.gf) return b.gf - a.gf;
+          return a.teamEs.localeCompare(b.teamEs);
+        });
+
+        const html = sortedTeams.map((team, idx) => {
+          const leftColor = idx < 2 ? '#10b981' : idx === 2 ? '#f59e0b' : 'transparent';
+          const gdClass = team.gd > 0 ? 'text-emerald-400' : team.gd < 0 ? 'text-red-400' : 'text-[var(--text-secondary)]';
+          const gdSign = team.gd > 0 ? '+' : '';
+          const flagUrl = getFlagUrl(team.team);
+
+          return `
+            <div
+              class="standings-row grid items-center px-3 py-2.5"
+              style="grid-template-columns: 1fr 26px 26px 26px 26px 28px 30px; border-left: 3px solid ${leftColor};"
+            >
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="text-xs text-[var(--text-secondary)] w-4 shrink-0">${idx + 1}</span>
+                <img src="${flagUrl}" alt="${team.teamEs}" class="flag-img shrink-0" onerror="this.style.display='none'" />
+                <span class="text-sm font-semibold truncate">${team.teamEs}</span>
+              </div>
+              <span class="text-xs text-center text-[var(--text-secondary)]">${team.played}</span>
+              <span class="text-xs text-center text-[var(--text-secondary)]">${team.won}</span>
+              <span class="text-xs text-center text-[var(--text-secondary)]">${team.drawn}</span>
+              <span class="text-xs text-center text-[var(--text-secondary)]">${team.lost}</span>
+              <span class="text-xs text-center font-semibold ${gdClass}">
+                ${gdSign}${team.gd}
+              </span>
+              <span class="text-sm font-black text-center text-amber-400">${team.points}</span>
+            </div>
+          `;
+        }).join('');
+
+        container.innerHTML = html;
+      });
+    }
+
+    let localMatches: any[] = [];
+
+    async function init() {
+      try {
+        const { data, error } = await supabase
+          .from('partidos')
+          .select('*');
+        if (error) throw error;
+        localMatches = data || [];
+        updateStandings(localMatches);
+      } catch (err) {
+        console.error('[Groups Standings] Error loading matches:', err);
+      }
+
+      supabase
+        .channel('groups-standings-tracker')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'partidos'
+        }, (payload: any) => {
+          const eventType = payload.eventType;
+          const newMatch = payload.new;
+          const oldMatch = payload.old;
+
+          if (eventType === 'INSERT') {
+            localMatches.push(newMatch);
+          } else if (eventType === 'UPDATE') {
+            const idx = localMatches.findIndex(m => m.id === newMatch.id);
+            if (idx !== -1) {
+              localMatches[idx] = newMatch;
+            } else {
+              localMatches.push(newMatch);
+            }
+          } else if (eventType === 'DELETE') {
+            localMatches = localMatches.filter(m => m.id !== oldMatch.id);
+          }
+
+          updateStandings(localMatches);
+        })
+        .subscribe();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
 </Layout>
