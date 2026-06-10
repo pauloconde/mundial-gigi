@@ -25,6 +25,9 @@
   "includeThirdPlacePrediction": false,
   "quinielaRequireReceipt": false,
   "quinielaPredictFinalScore": false,
+  "FixedMatchEnabled": false,
+  "FixedMatchTeamA": "",
+  "FixedMatchTeamB": "",
   "theme": "dark",
   "colors": {
     "appBg": "#080210",

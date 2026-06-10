@@ -20,6 +20,15 @@ const isClosed = now > endDate;
 const teams = Object.entries(TEAM_ES)
   .map(([id, name]) => ({ id, name, flag: getFlagUrl(id) }))
   .sort((a, b) => a.name.localeCompare(b.name));
+
+// Fixed Match configurations
+const isFixed = !!sponsorInfo.FixedMatchEnabled;
+const fixedTeamA = sponsorInfo.FixedMatchTeamA || '';
+const fixedTeamB = sponsorInfo.FixedMatchTeamB || '';
+const flagA = fixedTeamA ? getFlagUrl(fixedTeamA) : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+const flagB = fixedTeamB ? getFlagUrl(fixedTeamB) : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+const showPredictFinalScore = sponsorInfo.quinielaPredictFinalScore || isFixed;
+const showThirdPlace = sponsorInfo.includeThirdPlacePrediction && !isFixed;
 ---
 
 <Layout title="Quiniela" page="quiniela">
@@ -63,7 +72,7 @@ const teams = Object.entries(TEAM_ES)
           <form id="quiniela-form" class="space-y-5" 
                 data-sponsor={sponsorInfo.quinielaId}
                 data-require-receipt={sponsorInfo.quinielaRequireReceipt ? 'true' : 'false'}
-                data-predict-final-score={sponsorInfo.quinielaPredictFinalScore ? 'true' : 'false'}>
+                data-predict-final-score={showPredictFinalScore ? 'true' : 'false'}>
             
             <div class="space-y-1.5">
               <label class="text-[10px] font-bold text-[var(--text-primary)] uppercase tracking-wider ml-1">Cédula de Identidad</label>
@@ -140,46 +149,50 @@ const teams = Object.entries(TEAM_ES)
             <div class="h-px w-full bg-[var(--border-subtle)] my-6 opacity-50"></div>
 
             <div class="space-y-1.5">
-              <label class="text-[10px] font-bold text-[var(--text-primary)] uppercase tracking-wider ml-1">🏆 Campeón (1er Lugar)</label>
+              <label class="text-[10px] font-bold text-[var(--text-primary)] uppercase tracking-wider ml-1">
+                {isFixed ? `Goles de ${TEAM_ES[fixedTeamA] || fixedTeamA}` : '🏆 Campeón (1er Lugar)'}
+              </label>
               <div class="flex gap-2">
                 <div class="flex-1 relative flex items-center bg-[var(--bg-primary)] border border-[var(--border-subtle)] rounded-xl focus-within:border-[var(--brand-nav-icon-active,#f59e0b)] transition-colors pr-4">
                   <div class="w-12 flex shrink-0 items-center justify-center pl-3 pr-2 border-r border-[var(--border-subtle)]">
-                    <img id="flag-primer" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="w-6 h-4 object-cover rounded-sm" alt="" />
+                    <img id="flag-primer" src={isFixed ? flagA : "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="} class="w-6 h-4 object-cover rounded-sm" alt="" />
                   </div>
-                  <select id="primer-lugar" class="flex-1 bg-transparent px-3 py-3 text-[var(--text-primary)] text-sm outline-none font-medium appearance-none" required>
-                    <option value="" disabled selected>Selecciona el equipo ganador</option>
+                  <select id="primer-lugar" class="flex-1 bg-transparent px-3 py-3 text-[var(--text-primary)] text-sm outline-none font-medium appearance-none" required disabled={isFixed}>
+                    <option value="" disabled selected={!isFixed}>Selecciona el equipo ganador</option>
                     {teams.map(t => (
-                      <option value={t.id} data-flag={t.flag}>{t.name}</option>
+                      <option value={t.id} data-flag={t.flag} selected={isFixed && t.id === fixedTeamA}>{t.name}</option>
                     ))}
                   </select>
                 </div>
-                {sponsorInfo.quinielaPredictFinalScore && (
+                {showPredictFinalScore && (
                   <input type="number" id="primer-lugar-goles" placeholder="Goles" min="0" class="w-24 bg-[var(--bg-primary)] border border-[var(--border-subtle)] rounded-xl px-3 py-3 text-[var(--text-primary)] text-sm outline-none focus:border-[var(--brand-nav-icon-active,#f59e0b)] transition-colors text-center font-bold" required />
                 )}
               </div>
             </div>
 
             <div class="space-y-1.5">
-              <label class="text-[10px] font-bold text-[var(--text-primary)] uppercase tracking-wider ml-1">🥈 Subcampeón (2do Lugar)</label>
+              <label class="text-[10px] font-bold text-[var(--text-primary)] uppercase tracking-wider ml-1">
+                {isFixed ? `Goles de ${TEAM_ES[fixedTeamB] || fixedTeamB}` : '🥈 Subcampeón (2do Lugar)'}
+              </label>
               <div class="flex gap-2">
                 <div class="flex-1 relative flex items-center bg-[var(--bg-primary)] border border-[var(--border-subtle)] rounded-xl focus-within:border-[var(--brand-nav-icon-active,#f59e0b)] transition-colors pr-4">
                   <div class="w-12 flex shrink-0 items-center justify-center pl-3 pr-2 border-r border-[var(--border-subtle)]">
-                    <img id="flag-segundo" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="w-6 h-4 object-cover rounded-sm" alt="" />
+                    <img id="flag-segundo" src={isFixed ? flagB : "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="} class="w-6 h-4 object-cover rounded-sm" alt="" />
                   </div>
-                  <select id="segundo-lugar" class="flex-1 bg-transparent px-3 py-3 text-[var(--text-primary)] text-sm outline-none font-medium appearance-none" required>
-                    <option value="" disabled selected>Selecciona el segundo lugar</option>
+                  <select id="segundo-lugar" class="flex-1 bg-transparent px-3 py-3 text-[var(--text-primary)] text-sm outline-none font-medium appearance-none" required disabled={isFixed}>
+                    <option value="" disabled selected={!isFixed}>Selecciona el segundo lugar</option>
                     {teams.map(t => (
-                      <option value={t.id} data-flag={t.flag}>{t.name}</option>
+                      <option value={t.id} data-flag={t.flag} selected={isFixed && t.id === fixedTeamB}>{t.name}</option>
                     ))}
                   </select>
                 </div>
-                {sponsorInfo.quinielaPredictFinalScore && (
+                {showPredictFinalScore && (
                   <input type="number" id="segundo-lugar-goles" placeholder="Goles" min="0" class="w-24 bg-[var(--bg-primary)] border border-[var(--border-subtle)] rounded-xl px-3 py-3 text-[var(--text-primary)] text-sm outline-none focus:border-[var(--brand-nav-icon-active,#f59e0b)] transition-colors text-center font-bold" required />
                 )}
               </div>
             </div>
 
-            {sponsorInfo.includeThirdPlacePrediction && (
+            {showThirdPlace && (
               <div class="space-y-1.5">
                 <label class="text-[10px] font-bold text-[var(--text-primary)] uppercase tracking-wider ml-1">🥉 Tercer Lugar</label>
                 <div class="relative flex items-center bg-[var(--bg-primary)] border border-[var(--border-subtle)] rounded-xl focus-within:border-[var(--brand-nav-icon-active,#f59e0b)] transition-colors pr-4">
@@ -496,6 +509,9 @@ const teams = Object.entries(TEAM_ES)
     segundoSelect.addEventListener('change', () => { hideError(); updateDropdowns(); });
     if (tercerSelect) tercerSelect.addEventListener('change', () => { hideError(); updateDropdowns(); });
 
+    // Inicializar banderas y deshabilitar opciones repetidas en carga inicial
+    updateDropdowns();
+
     function showError(msg: string) {
       if (errorDiv) {
         errorDiv.textContent = msg;
@@ -663,4 +679,10 @@ const teams = Object.entries(TEAM_ES)
   :global(#bases-content li) { margin-bottom: 0.5rem; }
   :global(#bases-content a) { color: var(--brand-nav-icon-active, #f59e0b); text-decoration: underline; }
   :global(#bases-content strong) { font-weight: 600; color: var(--text-primary); }
+
+  select:disabled {
+    opacity: 0.95;
+    cursor: not-allowed;
+    -webkit-text-fill-color: var(--text-primary); /* Evita texto lavado en iOS Safari */
+  }
 </style>
