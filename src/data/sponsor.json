@@ -21,7 +21,7 @@
   "quinielaDescription": "Acierta el score final del partido inaugural y gana un premio.",
   "quinielaId": "gigi",
   "quinielaEndDate": "2026-06-11T19:00:00Z",
-  "quinielaPrizeImage": "/premio.png",
+  "quinielaPrizeImage": "/premio.webp",
   "includeThirdPlacePrediction": false,
   "quinielaRequireReceipt": false,
   "quinielaPredictFinalScore": true,
