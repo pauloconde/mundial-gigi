@@ -25,6 +25,9 @@
   "includeThirdPlacePrediction": true,
   "quinielaRequireReceipt": true,
   "quinielaPredictFinalScore": true,
+  "FixedMatchEnabled": true,
+  "FixedMatchTeamA": "MEX",
+  "FixedMatchTeamB": "RSA",
   "theme": "dark",
   "colors": {
     "appBg": "#080210",
