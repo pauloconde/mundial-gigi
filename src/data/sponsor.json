@@ -49,7 +49,7 @@
     "ogImage": "/ogimage.png"
   },
   "showBanner": false,
-  "bannerDuration": 5,
+  "bannerDuration": 2,
   "banner1url": "",
   "banner2url": "",
   "banner3url": "",
