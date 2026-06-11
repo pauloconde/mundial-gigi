@@ -20,7 +20,7 @@
   "quinielaTitle": "⚽ Gran Quiniela Gigi 🏆",
   "quinielaDescription": "Acierta el score final del partido inaugural y gana un premio.",
   "quinielaId": "gigi",
-  "quinielaEndDate": "2026-06-11T19:00:00Z",
+  "quinielaEndDate": "2026-06-10T19:00:00Z",
   "quinielaPrizeImage": "/premio.webp",
   "includeThirdPlacePrediction": false,
   "quinielaRequireReceipt": false,
